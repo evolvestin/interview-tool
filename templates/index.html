@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ru">
+{% include 'head.html' %}
+<body class="bg-gray-100 min-h-screen page-index">
+    <header class="fixed top-0 left-0 right-0 bg-white shadow-md p-4 z-10">
+        <div class="max-w-5xl mx-auto flex justify-between items-center">
+            <div class="flex items-center space-x-4">
+                <input type="text" id="interviewee-name" name="interviewee_name" placeholder="Имя интервьюируемого"
+                       class="p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                <button id="reset-btn" class="px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition">Сбросить</button>
+                <button id="finish-btn" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition">Завершить</button>
+            </div>
+            <div class="flex items-center space-x-4">
+                <a href="{{ url_for('list_questions') }}" class="text-blue-600 hover:underline">Список вопросов</a>
+                <a href="{{ url_for('add_question') }}" class="text-blue-600 hover:underline">Добавить вопрос</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-5xl mx-auto pt-24 pb-8 px-4">
+        <form id="interview-form" action="{{ url_for('results') }}" method="post">
+            <input type="hidden" name="results_data" id="results-data-input">
+            <input type="hidden" name="interviewee_name" id="interviewee-name-hidden">
+
+            <div id="main-interview-container">
+                {% for theme in themes %}
+                <div class="theme-container collapsed bg-blue-50 border-l-4 border-blue-500 rounded-lg p-4 mb-8" data-theme-id="{{ theme.id }}">
+                    <div class="theme-header flex justify-between items-center mb-4">
+                        <div class="flex items-center">
+                             <span class="toggle-icon text-gray-500 mr-2 transform transition-transform duration-200">▼</span>
+                             <h2 class="text-2xl font-bold text-gray-700">{{ theme.name }}</h2>
+                        </div>
+                    </div>
+                    <div class="theme-content hidden questions-list min-h-[50px] space-y-6">
+                        {% for q in questions_by_theme[theme.id] %}
+                            <div class="question-block bg-white rounded-lg shadow-md p-6" data-question-id="{{ q.id }}">
+                                <div class="flex justify-between items-start mb-4">
+                                    <h2 class="text-xl font-semibold text-gray-800 mr-4">{{ loop.index }}. {{ q.title | safe }}</h2>
+                                    <div class="controls flex space-x-2 flex-shrink-0">
+                                        <button type="button" class="control-btn text-xl p-1 hover:bg-green-100 rounded-full transition" data-value="positive">✅</button>
+                                        <button type="button" class="control-btn text-xl p-1 hover:bg-yellow-100 rounded-full transition" data-value="neutral">⚠️</button>
+                                        <button type="button" class="control-btn text-xl p-1 hover:bg-red-100 rounded-full transition" data-value="negative">❌</button>
+                                    </div>
+                                </div>
+                                <details class="bg-gray-50 p-4 rounded-lg">
+                                    <summary class="cursor-pointer font-medium text-gray-600">Показать ответ</summary>
+                                    <div class="prose max-w-none mt-2 pt-2 border-t">{{ q.answer | safe }}</div>
+                                </details>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endfor %}
+                <div class="theme-container-unthemed bg-gray-50 border-l-4 border-gray-400 rounded-lg p-4" data-theme-id="null">
+                     <h2 class="text-2xl font-bold text-gray-500 mb-4">Без темы</h2>
+                     <div id="unthemed-questions-container" class="questions-list min-h-[50px] space-y-6">
+                        {% for q in unthemed_questions %}
+                            <div class="question-block bg-white rounded-lg shadow-md p-6" data-question-id="{{ q.id }}">
+                                <div class="flex justify-between items-start mb-4">
+                                    <h2 class="text-xl font-semibold text-gray-800 mr-4">{{ loop.index }}. {{ q.title | safe }}</h2>
+                                    <div class="controls flex space-x-2 flex-shrink-0">
+                                        <button type="button" class="control-btn text-xl p-1 hover:bg-green-100 rounded-full transition" data-value="positive">✅</button>
+                                        <button type="button" class="control-btn text-xl p-1 hover:bg-yellow-100 rounded-full transition" data-value="neutral">⚠️</button>
+                                        <button type="button" class="control-btn text-xl p-1 hover:bg-red-100 rounded-full transition" data-value="negative">❌</button>
+                                    </div>
+                                </div>
+                                <details class="bg-gray-50 p-4 rounded-lg">
+                                    <summary class="cursor-pointer font-medium text-gray-600">Показать ответ</summary>
+                                    <div class="prose max-w-none mt-2 pt-2 border-t">{{ q.answer | safe }}</div>
+                                </details>
+                            </div>
+                        {% else %}
+                             {% if not themes and not unthemed_questions %}
+                                <p class="text-gray-600">Вопросов пока нет. <a href="{{ url_for('add_question') }}" class="text-blue-600 hover:underline">Добавьте первый вопрос</a>!</p>
+                             {% endif %}
+                        {% endfor %}
+                     </div>
+                </div>
+            </div>
+        </form>
+    </main>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

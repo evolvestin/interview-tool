@@ -1,0 +1,14 @@
+<div class="question-block bg-white rounded-lg shadow-md p-6" data-question-id="{{ q.id }}">
+    <div class="flex justify-between items-start mb-4">
+        <h2 class="text-xl font-semibold text-gray-800 mr-4">{{ loop.index }}. {{ q.title | safe }}</h2>
+        <div class="controls flex space-x-2 flex-shrink-0">
+            <button type="button" class="control-btn text-xl p-1 hover:bg-green-100 rounded-full transition" data-value="positive">✅</button>
+            <button type="button" class="control-btn text-xl p-1 hover:bg-yellow-100 rounded-full transition" data-value="neutral">⚠️</button>
+            <button type="button" class="control-btn text-xl p-1 hover:bg-red-100 rounded-full transition" data-value="negative">❌</button>
+        </div>
+    </div>
+    <details class="bg-gray-50 p-4 rounded-lg">
+        <summary class="cursor-pointer font-medium text-gray-600">Показать ответ</summary>
+        <div class="prose max-w-none mt-2 pt-2 border-t">{{ q.answer | safe }}</div>
+    </details>
+</div>

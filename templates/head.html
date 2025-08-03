@@ -1,0 +1,74 @@
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}{% endblock %}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+    <style>
+        body {
+            font-family: 'Noto Sans', sans-serif;
+        }
+        .code-block {
+            font-family: 'Roboto Mono', monospace;
+            background-color: #f0f0f0;
+            color: #e3342f;
+            padding: 2px 4px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+        }
+        /* Стили для перетаскивания ВОПРОСОВ */
+        .sortable-ghost {
+            opacity: 0.4;
+            background-color: #c0e0ff;
+        }
+        /* НОВЫЕ СТИЛИ для перетаскивания ТЕМ */
+        .sortable-ghost-theme {
+            opacity: 0.7;
+            background-color: #d1fae5; /* Светло-зеленый фон */
+            border: 2px dashed #10b981;
+        }
+
+        /* --- ИЗМЕНЕНИЕ НАЧАЛО --- */
+        /* На странице вопросов принудительно устанавливаем курсор для перетаскивания тем */
+        .page-questions .theme-header {
+            cursor: grab !important;
+        }
+        .page-questions .theme-header:active {
+            cursor: grabbing !important;
+        }
+        .page-questions .question-block {
+            cursor: grab;
+        }
+        .page-questions .question-block:active {
+            cursor: grabbing;
+        }
+        /* На главной странице показываем обычный курсор-указатель для сворачивания */
+        .page-index .theme-header {
+            cursor: pointer;
+        }
+        /* --- ИЗМЕНЕНИЕ КОНЕЦ --- */
+
+        /* Стили для редактируемого заголовка */
+        .theme-title-editable[contenteditable="true"] {
+            outline: 2px dashed #a0aec0;
+            padding: 0 4px;
+            cursor: text;
+        }
+        .delete-theme-btn {
+            display: none; /* Скрываем по умолчанию */
+            cursor: pointer;
+        }
+        .theme-container:hover .delete-theme-btn {
+            display: inline-block; /* Показываем при наведении */
+        }
+
+        /* Стили для иконки сворачивания */
+        .toggle-icon {
+            transition: transform 0.2s ease-in-out;
+        }
+        .collapsed .toggle-icon {
+            transform: rotate(-90deg);
+        }
+
+    </style>
+</head>

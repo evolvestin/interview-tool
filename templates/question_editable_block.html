@@ -1,0 +1,12 @@
+<div id="question-{{ q.id }}" class="question-block bg-white rounded-lg shadow-md p-6" data-question-id="{{ q.id }}">
+    <div class="flex items-start justify-between">
+        <h2 class="question-title text-xl font-semibold text-gray-800 w-full mr-4" contenteditable="false">{{ q.title | safe }}</h2>
+        <div class="question-controls flex space-x-2 flex-shrink-0">
+            <button class="edit-question-btn px-3 py-1 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">Редактировать</button>
+            <button class="save-question-btn px-3 py-1 bg-green-600 text-white rounded-lg hover:bg-green-700 transition hidden">Сохранить</button>
+            <button class="cancel-edit-btn px-3 py-1 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition hidden">Отмена</button>
+            <button class="delete-btn px-3 py-1 bg-red-600 text-white rounded-lg hover:bg-red-700 transition" data-question-id="{{ q.id }}">Удалить</button>
+        </div>
+    </div>
+    <div class="question-answer text-gray-600 prose max-w-none mt-2 pt-2 border-t" contenteditable="false">{{ q.answer | safe }}</div>
+</div>

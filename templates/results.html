@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="ru">
+{% include 'head.html' %}
+<body class="bg-gray-100 min-h-screen flex items-center justify-center p-4">
+    <div class="bg-white rounded-lg shadow-lg p-8 max-w-2xl w-full">
+        <h1 class="text-2xl font-bold text-gray-800 mb-6">Результаты интервью: {{ interviewee_name }}</h1>
+
+        <div class="summary bg-gray-50 rounded-lg p-6 mb-6">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4">Общая статистика</h2>
+            <p class="text-gray-700"><strong>Всего вопросов в скрининге:</strong> {{ total }}</p>
+            <p class="text-gray-700"><strong>Оценено вопросов:</strong> {{ answered }}</p>
+            <p class="text-gray-700"><strong>Пропущено вопросов (➖):</strong> {{ unanswered }}</p>
+            <hr class="my-2">
+            <p class="text-gray-700"><strong>Успешных ответов (✅):</strong> {{ positive }}</p>
+            <p class="text-gray-700"><strong>Нейтральных ответов (⚠️):</strong> {{ neutral }}</p>
+            <p class="text-gray-700"><strong>Неуспешных ответов (❌):</strong> {{ negative }}</p>
+            <hr class="my-2">
+            <p class="text-gray-700 font-bold"><strong>Рейтинг (от оцененных):</strong> {{ rating | round(1) }}%</p>
+        </div>
+
+        <h2 class="text-xl font-semibold text-gray-800 mb-4">Детализация по вопросам</h2>
+
+        {% for theme_name, results in results_by_theme.items() %}
+        <div class="mb-6">
+            <h3 class="text-lg font-semibold text-gray-600 border-b pb-2 mb-3">{{ theme_name }}</h3>
+            <ul class="result-list space-y-2">
+                {% for result in results %}
+                <li class="flex items-center text-gray-700">
+                    <span class="text-2xl mr-3">{{ result.status_icon }}</span>
+                    <span>{{ result.title | safe }}</span>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% else %}
+        <p>Нет данных для отображения.</p>
+        {% endfor %}
+
+        <a href="{{ url_for('index_page') }}" class="block mt-6 text-blue-600 hover:underline">Провести новое интервью</a>
+    </div>
+</body>
+</html>

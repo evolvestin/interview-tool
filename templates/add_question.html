@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="ru">
+{% include 'head.html' %}
+<body class="bg-gray-100 min-h-screen flex items-center justify-center p-4">
+    <div class="bg-white rounded-lg shadow-lg p-8 max-w-2xl w-full">
+        <h1 class="text-2xl font-bold text-gray-800 mb-6">Добавить новый вопрос</h1>
+
+        <form action="{{ url_for('add_question') }}" method="post" id="add-question-form">
+            <div class="mb-4">
+                <label for="title" class="block text-gray-700 font-medium mb-2">Вопрос (заголовок):</label>
+                <div class="editor-toolbar flex space-x-2 mb-2" data-target="title-editor">
+                    <button type="button" data-style="bold" class="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300 transition"><b>B</b></button>
+                    <button type="button" data-style="italic" class="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300 transition"><i>I</i></button>
+                    <button type="button" data-style="underline" class="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300 transition"><u>U</u></button>
+                    <button type="button" data-style="code" class="px-3 py-1 bg-gray-800 text-white rounded hover:bg-gray-900 transition">Code</button>
+                </div>
+                <div id="title-editor" contenteditable="true" class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none min-h-[100px]"></div>
+                <textarea id="title" name="title" class="hidden"></textarea>
+            </div>
+
+            <div class="mb-4">
+                <label for="answer" class="block text-gray-700 font-medium mb-2">Развернутый ответ:</label>
+                <div class="editor-toolbar flex space-x-2 mb-2" data-target="answer-editor">
+                    <button type="button" data-style="bold" class="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300 transition"><b>B</b></button>
+                    <button type="button" data-style="italic" class="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300 transition"><i>I</i></button>
+                    <button type="button" data-style="underline" class="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300 transition"><u>U</u></button>
+                    <button type="button" data-style="code" class="px-3 py-1 bg-gray-800 text-white rounded hover:bg-gray-900 transition">Code</button>
+                </div>
+                <div id="answer-editor" contenteditable="true" class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none min-h-[200px]"></div>
+                <textarea id="answer" name="answer" class="hidden"></textarea>
+            </div>
+
+            <div class="mb-6">
+                <label for="theme_id" class="block text-gray-700 font-medium mb-2">Тема:</label>
+                <select name="theme_id" id="theme_id" class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                    <option value="">Без темы</option>
+                    {% for theme in themes %}
+                    <option value="{{ theme.id }}">{{ theme.name }}</option>
+                    {% endfor %}
+                    <option value="new">-- Создать новую тему --</option>
+                </select>
+            </div>
+
+            <div id="new-theme-name-wrapper" class="hidden mb-6">
+                <label for="new_theme_name" class="block text-gray-700 font-medium mb-2">Название новой темы:</label>
+                <input type="text" name="new_theme_name" id="new_theme_name" class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+            </div>
+
+            <button type="submit" class="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition">Сохранить вопрос</button>
+        </form>
+    </div>
+
+    <script>
+        // Функция для применения стилей к выделенному тексту
+        function applyStyle(style, editorId) {
+            const editor = document.getElementById(editorId);
+            editor.focus();
+            // Для стиля "code" оборачиваем выделение в тег <code> с классом
+            if (style === 'code') {
+                document.execCommand('insertHTML', false, '<code class="code-block">' + document.getSelection().toString() + '</code>');
+            } else {
+                // Для остальных стилей используем стандартные команды
+                document.execCommand(style, false, null);
+            }
+        }
+
+        // Функция для синхронизации содержимого редактора с скрытым полем textarea
+        function syncEditorToTextarea(editorId, textareaId) {
+            const editor = document.getElementById(editorId);
+            const textarea = document.getElementById(textareaId);
+            textarea.value = editor.innerHTML;
+        }
+
+        // Назначаем обработчики на кнопки тулбара
+        document.querySelectorAll('.editor-toolbar button').forEach(button => {
+            button.addEventListener('click', (e) => {
+                const style = e.currentTarget.dataset.style;
+                const targetEditorId = e.currentTarget.closest('.editor-toolbar').dataset.target;
+                applyStyle(style, targetEditorId);
+            });
+        });
+
+        // Показываем/скрываем поле для ввода новой темы
+        const themeSelect = document.getElementById('theme_id');
+        const newThemeWrapper = document.getElementById('new-theme-name-wrapper');
+        themeSelect.addEventListener('change', () => {
+            if (themeSelect.value === 'new') {
+                newThemeWrapper.classList.remove('hidden');
+            } else {
+                newThemeWrapper.classList.add('hidden');
+            }
+        });
+
+        // --- НОВЫЙ КОД: ОБРАБОТКА ВСТАВКИ ДЛЯ ОЧИСТКИ ФОРМАТИРОВАНИЯ ---
+        function handlePasteAsPlainText(e) {
+            // Отменяем стандартное действие вставки (которое вставляет HTML)
+            e.preventDefault();
+            // Получаем текст из буфера обмена
+            const text = e.clipboardData.getData('text/plain');
+            // Вставляем чистый текст в позицию курсора
+            document.execCommand('insertText', false, text);
+        }
+
+        const titleEditor = document.getElementById('title-editor');
+        const answerEditor = document.getElementById('answer-editor');
+
+        // Назначаем обработчик на оба редактора
+        titleEditor.addEventListener('paste', handlePasteAsPlainText);
+        answerEditor.addEventListener('paste', handlePasteAsPlainText);
+        // --- КОНЕЦ НОВОГО КОДА ---
+
+
+        // САМОЕ ВАЖНОЕ: Синхронизация перед отправкой формы
+        document.getElementById('add-question-form').addEventListener('submit', () => {
+            syncEditorToTextarea('title-editor', 'title');
+            syncEditorToTextarea('answer-editor', 'answer');
+        });
+    </script>
+</body>
+</html>
